@@ -19,7 +19,6 @@ const categoryConfig = {
 
 const MonthlyView: React.FC<MonthlyViewProps> = ({ transactions }) => {
   const [currentPage, setCurrentPage] = useState<PageType>('today')
-  const [isFlipping, setIsFlipping] = useState(false)
 
   // Calculate data for different time periods
   const todayTransactions = useMemo(() => {
@@ -59,7 +58,7 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ transactions }) => {
     return trans.reduce((sum, t) => sum + t.amount, 0)
   }
 
-  const getCategoryTotal = (trans: Transaction[]) => {
+  const getCategoryTotals = (trans: Transaction[]) => {
     const totals: Record<string, number> = {}
     trans.forEach(t => {
       totals[t.category] = (totals[t.category] || 0) + t.amount
@@ -108,17 +107,12 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ transactions }) => {
     if (page === currentPage) return
 
     playChing()
-    setIsFlipping(true)
-
-    setTimeout(() => {
-      setCurrentPage(page)
-      setIsFlipping(false)
-    }, 300)
+    setCurrentPage(page)
   }
 
   const currentTransactions = getCurrentTransactions()
   const currentTotal = calculateTotal(currentTransactions)
-  const categoryTotals = getCategoryTotal(currentTransactions)
+  const categoryTotals = getCategoryTotals(currentTransactions)
 
   const pages = [
     { id: 'today', label: 'Hôm nay', icon: '📅', count: todayTransactions.length },
@@ -128,7 +122,7 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ transactions }) => {
   ]
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-amber-100 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-sm border border-amber-100 overflow-hidden animate-page-flip">
       {/* Header */}
       <div className="px-6 py-4 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100">
         <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
@@ -164,10 +158,9 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ transactions }) => {
 
           <div className="text-sm text-gray-500">
             <span className="px-2 py-1 bg-white rounded border border-gray-200">
-              {currentPage === 'today' ? 'Đang ghi' : formatDate(
-                currentPage === 'yesterday'
-                  ? yesterdayTransactions[0]?.date || new Date().toISOString()
-                  : weekTransactions[0]?.date || new Date().toISOString()
+              {currentPage === 'today' ? formatDate(new Date().toISOString()) :
+               currentPage === 'yesterday' ? formatDate(yesterdayTransactions[0]?.date || new Date().toISOString()) :
+               weekTransactions[0]?.date || new Date().toISOString()}
               )}
             </span>
           </div>
@@ -175,76 +168,72 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ transactions }) => {
       </div>
 
       {/* Page Content */}
-      <div className={`relative ${isFlipping ? 'animate-page-flip' : ''}`}>
-        <div className="px-6 py-4">
-          {/* Summary Card */}
-          <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl p-4 mb-6 page-curl">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-2">
-                {currentPage === 'today' ? 'Tổng chi hôm nay' :
+      <div className="px-6 py-4">
+        {/* Summary Card */}
+        <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl p-4 mb-6 page-curl">
+          <div className="text-center">
+            <p className="text-sm text-gray-600 mb-2">
+              {currentPage === 'today' ? 'Tổng chi hôm nay' :
                  currentPage === 'yesterday' ? 'Tổng chi hôm qua' :
                  currentPage === 'week' ? 'Tổng chi tuần này' : 'Tổng chi tháng này'}
-              </p>
-              <p className="text-3xl font-bold text-gray-900 ink-effect">
-                {formatCurrency(currentTotal)}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                {currentTransactions.length} giao dịch
-              </p>
-            </div>
-          </div>
-
-          {/* Category Breakdown */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            {Object.entries(categoryTotals).map(([category, amount]) => {
-              const config = categoryConfig[category as keyof typeof categoryConfig] || categoryConfig.khac
-              const percentage = currentTotal > 0 ? (amount / currentTotal * 100).toFixed(1) : '0'
-
-              return (
-                <div key={category} className="bg-orange-50 rounded-lg p-3 border border-orange-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">{config.icon}</span>
-                    <span className="font-medium text-sm text-gray-700">{config.label}</span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-gray-900">{formatCurrency(amount)}</p>
-                    <p className="text-xs text-gray-500">{percentage}%</p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Transaction List */}
-          <div className="space-y-3">
-            {currentTransactions.map((transaction) => {
-              const config = categoryConfig[transaction.category as keyof typeof categoryConfig] || categoryConfig.khac
-
-              return (
-                <div
-                  key={transaction.id}
-                  className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100 paper-texture"
-                >
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg bg-white shadow-sm border border-orange-200">
-                    {config.icon}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-gray-800">{config.label}</span>
-                      <span className="text-xs text-gray-400">{formatTime(transaction.date)}</span>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-gray-900">{formatCurrency(transaction.amount)}</p>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+            </p>
+            <p className="text-3xl font-bold text-gray-900 ink-effect">
+              {formatCurrency(currentTotal)}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              {currentTransactions.length} giao dịch
+            </p>
           </div>
         </div>
-      </div>
 
-      {/* Flip Animation Styles - moved to index.css */}
+        {/* Category Breakdown */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {Object.entries(categoryTotals).map(([category, amount]) => {
+            const config = categoryConfig[category as keyof typeof categoryConfig] || categoryConfig.khac
+            const percentage = currentTotal > 0 ? ((amount / currentTotal) * 100).toFixed(1) : '0'
+
+            return (
+              <div key={category} className="bg-orange-50 rounded-lg p-3 border border-orange-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">{config.icon}</span>
+                  <span className="font-medium text-sm text-gray-700">{config.label}</span>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-gray-900">{formatCurrency(amount)}</p>
+                  <p className="text-xs text-gray-500">{percentage}%</p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Transaction List */}
+        <div className="space-y-3">
+          {currentTransactions.map((transaction) => {
+            const config = categoryConfig[transaction.category as keyof typeof categoryConfig] || categoryConfig.khac
+
+            return (
+              <div
+                key={transaction.id}
+                className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100 paper-texture"
+              >
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg bg-white shadow-sm border border-orange-200">
+                  {config.icon}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-medium text-gray-800">{config.label}</span>
+                    <span className="text-xs text-gray-400">{formatTime(transaction.date)}</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">{formatCurrency(transaction.amount)}</p>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
     </div>
   )
 }
