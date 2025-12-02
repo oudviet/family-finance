@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { playTin } from '../hooks/useSounds'
+import { useSounds } from '../hooks/useSounds'
 
 interface ExpenseData {
   amount: string
@@ -18,6 +18,7 @@ interface ExpenseFormProps {
 }
 
 const ExpenseForm = ({ onAdd }: ExpenseFormProps) => {
+  const { playTin } = useSounds()
   const [expenseData, setExpenseData] = useState<ExpenseData>({
     amount: '',
     category: ''

@@ -3,7 +3,7 @@ import { useCallback } from 'react'
 type SoundType = 'tin' | 'shing' | 'ching'
 
 // Sound effect functions using Web Audio API
-const playSound = useCallback((type: SoundType): void => {
+const playSound = (type: SoundType): void => {
   try {
     if (typeof window === 'undefined' || !window.AudioContext) {
       return
@@ -51,7 +51,7 @@ const playSound = useCallback((type: SoundType): void => {
     // Silently fail if audio is not supported
     console.debug('Sound effect failed:', error)
   }
-}, [])
+}
 
 // Hook for playing sounds
 export const useSounds = () => {
@@ -66,9 +66,3 @@ export const useSounds = () => {
   }
 }
 
-// Export individual sound functions for components that don't want full hook
-export const { playTin, playShing, playChing } = {
-  playTin: () => playSound('tin'),
-  playShing: () => playSound('shing'),
-  playChing: () => playSound('ching')
-}

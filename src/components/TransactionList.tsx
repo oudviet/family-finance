@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Transaction } from '../hooks/useTransactions'
-import { playShing } from '../hooks/useSounds'
+import { useSounds } from '../hooks/useSounds'
 
 interface TransactionListProps {
   transactions: Transaction[]
@@ -73,6 +73,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
   transactions,
   onDelete
 }) => {
+  const { playShing } = useSounds()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
 
   // Sort transactions by time (newest first)

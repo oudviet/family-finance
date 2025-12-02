@@ -111,8 +111,26 @@ export const useTransactions = (): UseTransactionsReturn => {
         return
       }
 
+      // Security warning before clearing data
+      const confirmed = window.confirm(
+        '⚠️ CẢNH BẢO: XÓA TOÀN BỘ DỮ LIỆU\n\n' +
+        'Bạn sắp xóa TẤT CẢ lịch sử chi tiêu:\n' +
+        '• ' + transactions.length + ' giao dịch\n' +
+        '• Tổng: ' + new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(transactions.reduce((sum, t) => sum + t.amount, 0)) + '\n\n' +
+        '❗ Dữ liệu sẽ MẤT HOÀN TOÀN và KHÔNG THỂ khôi phục!\n\n' +
+        '💡 Gợi ý: Hãy xuất file CSV trước khi xóa để sao lưu dữ liệu.\n\n' +
+        'Bạn có chắc chắn muốn xóa không?'
+      )
+
+      if (!confirmed) {
+        return
+      }
+
       localStorage.removeItem(STORAGE_KEY)
       setTransactions([])
+
+      // Show success message
+      alert('✅ Đã xóa toàn bộ dữ liệu. Tất cả giao dịch đã bị xóa vĩnh viễn.')
     } catch (error) {
       console.error('Error clearing transactions from localStorage:', error)
     }
