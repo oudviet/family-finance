@@ -1,3 +1,107 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Paper notebook animations */
+@keyframes paper-fold {
+  0% {
+    transform: translateY(-20px) rotateX(-90deg);
+    opacity: 0;
+    filter: blur(8px);
+  }
+  50% {
+    transform: translateY(0px) rotateX(0deg);
+    opacity: 0.8;
+    filter: blur(2px);
+  }
+  100% {
+    transform: translateY(0px) rotateX(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+@keyframes writing {
+  0% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.05);
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
+}
+
+.animate-paper-fold {
+  animation: paper-fold 0.3s ease-out;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.animate-writing {
+  animation: writing 0.8s ease-in-out;
+  background: linear-gradient(90deg,
+    rgba(255, 251, 235, 0.9) 0%,
+    rgba(254, 243, 199, 0.9) 50%,
+    rgba(255, 251, 235, 0.9) 100%);
+  background-size: 200% 200%;
+}
+
+/* Paper texture overlay */
+.paper-texture {
+  position: relative;
+  background: linear-gradient(135deg,
+    rgba(255, 251, 235, 0.9) 0%,
+    rgba(254, 243, 199, 0.95) 100%);
+  background-size: 4px 4px;
+}
+
+.paper-texture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(254, 243, 199, 0.05) 2px,
+      rgba(254, 243, 199, 0.05) 4px
+    );
+  background-size: 4px 4px;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Soft blur transitions */
+.blur-transition {
+  transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.blur-transition:hover {
+  filter: brightness(1.02) saturate(1.1);
+  transform: translateY(-1px);
+}
+
+/* Ink pen effect */
+.ink-effect {
+  text-shadow: 0.5px 0.5px 0.5px rgba(139, 69, 19, 0.1);
+}
+
+/* Subtle page curl */
+.page-curl {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Focus ring like paper shadow */
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.3),
+              0 0 0 6px rgba(251, 146, 60, 0.1);
+}

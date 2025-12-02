@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Transaction } from '../hooks/useTransactions'
+import { playShing } from '../hooks/useSounds'
 
 interface TransactionListProps {
   transactions: Transaction[]
@@ -90,6 +91,9 @@ const TransactionList: React.FC<TransactionListProps> = ({
   }
 
   const handleDelete = (id: string) => {
+    // Play delete sound
+    playShing()
+
     if (onDelete) {
       onDelete(id)
       setShowDeleteConfirm(null)

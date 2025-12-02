@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { playTin } from '../hooks/useSounds'
 
 interface ExpenseData {
   amount: string
@@ -91,6 +92,9 @@ const ExpenseForm = ({ onAdd }: ExpenseFormProps) => {
         console.log('Expense submitted:', { ...newExpense, categoryName })
         alert(`Đã thêm chi tiêu: ${newExpense.amount.toLocaleString('vi-VN')} VNĐ - ${categoryName}`)
       }
+
+      // Play success sound
+      playTin()
 
       // Reset form
       setExpenseData({
