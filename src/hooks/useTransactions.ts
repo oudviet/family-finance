@@ -13,6 +13,7 @@ export interface Transaction {
 export interface UseTransactionsReturn {
   transactions: Transaction[]
   addTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void
+  deleteTransaction: (id: string) => void
   clearTransactions: () => void
 }
 
@@ -98,6 +99,11 @@ export const useTransactions = (): UseTransactionsReturn => {
     setTransactions(prev => [...prev, newTransaction])
   }
 
+  // Delete a specific transaction
+  const deleteTransaction = (id: string): void => {
+    setTransactions(prev => prev.filter(transaction => transaction.id !== id))
+  }
+
   // Clear all transactions
   const clearTransactions = (): void => {
     try {
@@ -115,6 +121,7 @@ export const useTransactions = (): UseTransactionsReturn => {
   return {
     transactions,
     addTransaction,
+    deleteTransaction,
     clearTransactions
   }
 }

@@ -1,9 +1,10 @@
 import { useTransactions } from './hooks/useTransactions'
 import ExpenseForm from './components/ExpenseForm'
+import TransactionList from './components/TransactionList'
 import { useMemo } from 'react'
 
 function App() {
-  const { transactions, addTransaction } = useTransactions()
+  const { transactions, addTransaction, deleteTransaction } = useTransactions()
 
   // Calculate today's total
   const todayTotal = useMemo(() => {
@@ -51,6 +52,16 @@ function App() {
 
         {/* Expense Form */}
         <ExpenseForm onAdd={addTransaction} />
+
+        {/* Transaction List */}
+        <div className="mt-6">
+          <TransactionList
+            transactions={transactions.filter(t =>
+              new Date(t.date).toDateString() === new Date().toDateString()
+            )}
+            onDelete={deleteTransaction}
+          />
+        </div>
 
         {/* Footer Stats */}
         {transactions.length > 0 && (
